@@ -1,16 +1,48 @@
-# React + Vite
+# 🎓 Jyoti Academy Portal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A personalized **tuition management dashboard** built for my mom’s tuition centre — designed to simplify daily teaching tasks like fee tracking, test planning, and student management.
 
-Currently, two official plugins are available:
+Built with ❤️ using **React + Tailwind CSS + Vite**, this web app combines clean design, interactivity, and a sprinkle of AI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🧾 Dashboard
 
-## Expanding the ESLint configuration
+- Displays key stats like **total students**, **fees collected**, and **pending payments**
+- Responsive & clean layout with live data cards
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🎨 Dynamic Theme System
+
+- Five fully reactive color themes (💜 Purple, 🌿 Emerald, ☀️ Amber, 🌊 Teal, 🩶 Gray)
+- Theme persists with localStorage — your color stays after refresh
+
+### 🔊 Interactive Sound Feedback
+
+- Satisfying click and hover sounds for buttons and menus
+- Built using a custom reusable `useSound()` React hook
+
+### 📁 Collapsible Sidebar
+
+- Smooth animations with icons from **Lucide React**
+- Active state highlighting and hover animations
+- New section: **🧠 Test Planner** for generating tests from uploaded PDFs (in progress)
+
+### 🌈 Microinteractions Everywhere
+
+- Animated theme swatches
+- Hover effects with scale, brightness, and opacity transitions
+- Subtle motion for sidebar toggle and menu clicks
+
+---
+
+## 🧠 Tech Stack
+
+| Frontend        | Styling         | Icons           | Extras                |
+| --------------- | --------------- | --------------- | --------------------- |
+| React (Vite) ⚡ | Tailwind CSS 🎨 | Lucide React 🖋️ | Custom React Hooks 🎧 |
+
+---
+
+## 🧩 Folder Structure
