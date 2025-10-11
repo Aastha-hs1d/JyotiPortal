@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   Home,
   Users,
@@ -14,26 +15,29 @@ import clickSound from "../assets/sounds/click.wav";
 import hoverSound from "../assets/sounds/hover.wav";
 import { useSound } from "../hooks/useSound";
 
-const Sidebar = () => {
-  const [active, setActive] = useState("Dashboard");
-  const [collapsed, setCollapsed] = useState(false);
+const Sidebar = ({ collapsed, setCollapsed, themeName, setThemeName }) => {
+  const location = useLocation();
 
   const playClick = useSound(clickSound, 0.3);
   const playHover = useSound(hoverSound, 0.15);
 
   const menuItems = [
-    { name: "Dashboard", icon: <Home size={20} /> },
-    { name: "Students", icon: <Users size={20} /> },
-    { name: "Fees", icon: <FileText size={20} /> },
-    { name: "Notes", icon: <BookOpen size={20} /> },
-    { name: "Test Planner", icon: <ClipboardList size={20} /> }, // ✨ new section
-    { name: "Announcements", icon: <Bell size={20} /> },
-    { name: "Settings", icon: <Settings size={20} /> },
+    { name: "Dashboard", icon: <Home size={20} />, path: "/" },
+    { name: "Students", icon: <Users size={20} />, path: "/students" },
+    { name: "Fees", icon: <FileText size={20} />, path: "/fees" },
+    { name: "Notes", icon: <BookOpen size={20} />, path: "/notes" },
+    {
+      name: "Test Planner",
+      icon: <ClipboardList size={20} />,
+      path: "/test-planner",
+    },
+    { name: "Announcements", icon: <Bell size={20} />, path: "/announcements" },
+    { name: "Settings", icon: <Settings size={20} />, path: "/settings" },
   ];
 
   return (
     <div
-      className={`h-screen transition-all duration-300 ${
+      className={`h-screen fixed top-0 left-0 transition-all duration-300 ${
         collapsed ? "w-20" : "w-64"
       } text-white flex flex-col shadow-lg`}
       style={{ backgroundColor: "var(--color-primary)" }}
@@ -59,28 +63,32 @@ const Sidebar = () => {
 
       {/* Menu */}
       <ul className="flex-1 mt-4">
-        {menuItems.map((item) => (
-          <li
-            key={item.name}
-            onClick={() => {
-              setActive(item.name);
-              playClick();
-            }}
-            onMouseEnter={playHover}
-            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:brightness-110 ${
-              active === item.name ? "opacity-95" : "opacity-80"
-            }`}
-            style={{
-              backgroundColor:
-                active === item.name
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <li
+              key={item.name}
+              onMouseEnter={playHover}
+              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:brightness-110 ${
+                isActive ? "opacity-95" : "opacity-80"
+              }`}
+              style={{
+                backgroundColor: isActive
                   ? "var(--color-primary-light)"
                   : "var(--color-primary)",
-            }}
-          >
-            {item.icon}
-            {!collapsed && <span>{item.name}</span>}
-          </li>
-        ))}
+              }}
+            >
+              <Link
+                to={item.path}
+                onClick={playClick}
+                className="flex items-center gap-3 w-full"
+              >
+                {item.icon}
+                {!collapsed && <span>{item.name}</span>}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

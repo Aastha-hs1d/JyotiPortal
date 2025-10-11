@@ -2,15 +2,46 @@ import { themes } from "../theme";
 import clickSound from "../assets/sounds/click.wav";
 import hoverSound from "../assets/sounds/hover.wav";
 import { useSound } from "../hooks/useSound";
+import { useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion"; // 👈 new import
 
 const Navbar = ({ themeName, setThemeName }) => {
   const playClick = useSound(clickSound, 0.3);
   const playHover = useSound(hoverSound, 0.15);
 
+  const location = useLocation();
+
+  const pageTitles = {
+    "/": "Dashboard",
+    "/students": "Student Management",
+    "/fees": "Fees Overview",
+    "/notes": "Notes",
+    "/test-planner": "Test Planner",
+    "/announcements": "Announcements",
+    "/settings": "Settings",
+  };
+
+  const currentTitle = pageTitles[location.pathname] || "";
+
   return (
     <div className="w-full bg-white shadow-sm flex justify-between items-center px-6 py-3">
-      <h2 className="text-xl font-semibold text-gray-700">Dashboard</h2>
+      {/* 🔮 animated page title */}
+      <div className="relative h-[28px] flex items-center max-w-[280px] overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.h2
+            key={currentTitle}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="text-xl font-semibold text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis"
+          >
+            {currentTitle || ""}
+          </motion.h2>
+        </AnimatePresence>
+      </div>
 
+      {/* right side (theme + logout) */}
       <div className="flex items-center gap-6">
         {/* Theme Swatches */}
         <div className="flex gap-3">

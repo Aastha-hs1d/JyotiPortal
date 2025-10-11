@@ -35,4 +35,11 @@ export const themes = {
     border: "#9ca3af",
     bg: "#f3f4f6",
   },
+  copperSulphate: {
+    primary: "#0E2466", // deep copper sulphate crystal blue
+    primaryLight: "#4156A1", // hydrated lighter reflection
+    border: "#C7D3FF", // soft card borders
+    bg: "#F0F4FF", // very pale background
+    accent: "#5A7BFF",
+  },
 };
