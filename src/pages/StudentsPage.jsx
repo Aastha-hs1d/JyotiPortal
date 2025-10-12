@@ -14,6 +14,7 @@ const StudentsPage = () => {
   });
   const [editingId, setEditingId] = useState(null);
   const [sortOption, setSortOption] = useState("none");
+  const [sortOrder, setSortOrder] = useState("asc"); // ⬅️ NEW
   const [filterGrade, setFilterGrade] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -80,7 +81,7 @@ const StudentsPage = () => {
     }
   };
 
-  // 🔍 Search + Sort + Filter logic
+  // 🔍 Filter, Search, and Sort logic
   const filteredAndSorted = useMemo(() => {
     let data = [...students];
 
@@ -96,24 +97,44 @@ const StudentsPage = () => {
       );
     }
 
-    // Sort
-    if (sortOption === "name") {
-      data.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortOption === "grade") {
-      data.sort((a, b) => a.grade.localeCompare(b.grade));
-    } else if (sortOption === "joinDate") {
-      data.sort((a, b) => new Date(a.joinDate) - new Date(b.joinDate));
+    // Sort (unified + asc/desc)
+    if (sortOption !== "none") {
+      data.sort((a, b) => {
+        let comparison = 0;
+
+        if (sortOption === "name") {
+          comparison = a.name.localeCompare(b.name, undefined, {
+            sensitivity: "base",
+          });
+        }
+
+        if (sortOption === "grade") {
+          const getGradeValue = (grade) => {
+            if (!grade) return 9999;
+            if (/nursery/i.test(grade)) return 0;
+            if (/kg/i.test(grade)) return 1;
+            const match = grade.match(/\d+/);
+            return match ? parseInt(match[0]) : 9999;
+          };
+          comparison = getGradeValue(a.grade) - getGradeValue(b.grade);
+        }
+
+        if (sortOption === "joinDate") {
+          comparison = new Date(a.joinDate) - new Date(b.joinDate);
+        }
+
+        return sortOrder === "desc" ? -comparison : comparison;
+      });
     }
 
     return data;
-  }, [students, sortOption, filterGrade, searchQuery]);
+  }, [students, sortOption, sortOrder, filterGrade, searchQuery]);
 
   const uniqueGrades = [...new Set(students.map((s) => s.grade))];
   const totalDisplayed = filteredAndSorted.length;
 
   return (
     <div className="p-6">
-      {/* Header */}
       <p className="text-gray-600 mt-2 mb-6">
         Add, view, and manage student details, admissions, and fee status.
       </p>
@@ -133,7 +154,6 @@ const StudentsPage = () => {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-5 gap-4"
         >
-          {/* Full Name */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               Full Name
@@ -148,7 +168,6 @@ const StudentsPage = () => {
             />
           </div>
 
-          {/* Class */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">Class</label>
             <input
@@ -161,7 +180,6 @@ const StudentsPage = () => {
             />
           </div>
 
-          {/* Monthly Fee */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               Monthly Fee (₹)
@@ -176,7 +194,6 @@ const StudentsPage = () => {
             />
           </div>
 
-          {/* Phone */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               Phone Number
@@ -191,7 +208,6 @@ const StudentsPage = () => {
             />
           </div>
 
-          {/* Admission Date */}
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               Admission Date
@@ -205,7 +221,6 @@ const StudentsPage = () => {
             />
           </div>
 
-          {/* Buttons */}
           <div className="md:col-span-5 flex gap-3">
             <button
               type="submit"
@@ -236,9 +251,9 @@ const StudentsPage = () => {
         </form>
       </div>
 
-      {/* Search, Filter, Sort, and Counter */}
+      {/* Search + Filter + Sort */}
       <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
-        {/* Search Bar */}
+        {/* Search */}
         <div className="relative flex items-center w-full sm:w-auto">
           <Search className="absolute left-3 text-gray-400" size={18} />
           <input
@@ -250,8 +265,9 @@ const StudentsPage = () => {
           />
         </div>
 
-        {/* Filter + Sort */}
+        {/* Sort + Filter */}
         <div className="flex flex-wrap items-center gap-4">
+          {/* Sort by */}
           <div className="flex items-center gap-2">
             <span className="text-gray-600 text-sm">Sort by:</span>
             <select
@@ -266,6 +282,20 @@ const StudentsPage = () => {
             </select>
           </div>
 
+          {/* Asc / Desc */}
+          <div className="flex items-center gap-2">
+            <span className="text-gray-600 text-sm">Order:</span>
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm cursor-pointer hover:border-gray-400 focus:ring-2 focus:ring-[var(--color-primary-light)]"
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+
+          {/* Filter by Grade */}
           <div className="flex items-center gap-2">
             <span className="text-gray-600 text-sm">Filter by Grade:</span>
             <select
@@ -283,7 +313,7 @@ const StudentsPage = () => {
           </div>
         </div>
 
-        {/* Total Count */}
+        {/* Count */}
         <div className="text-sm font-medium text-gray-600">
           Showing{" "}
           <span className="text-[var(--color-primary)]">{totalDisplayed}</span>{" "}
@@ -291,7 +321,7 @@ const StudentsPage = () => {
         </div>
       </div>
 
-      {/* Student Table */}
+      {/* Table */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-x-auto">
         <table className="min-w-full text-sm text-left text-gray-700">
           <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-xs">
