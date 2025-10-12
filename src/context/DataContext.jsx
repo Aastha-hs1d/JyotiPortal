@@ -89,6 +89,7 @@ export const DataProvider = ({ children }) => {
             amountPaid: 0,
             paidDate: null,
             paid: false,
+            paymentNote: "",
           });
         } else {
           // 🧩 Recalculate carry forward dynamically if previous month was updated

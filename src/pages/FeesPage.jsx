@@ -15,6 +15,7 @@ const FeesPage = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [amountInput, setAmountInput] = useState("");
   const [paidOnInput, setPaidOnInput] = useState("");
+  const [noteInput, setNoteInput] = useState("");
   const [expandedStudent, setExpandedStudent] = useState(null);
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const FeesPage = () => {
     const rec = getRecord(student.id);
     setAmountInput(rec?.amountPaid || "");
     setPaidOnInput(rec?.paidDate || "");
+    setNoteInput(rec?.paymentNote || "");
     setShowModal(true);
   };
 
@@ -58,12 +60,14 @@ const FeesPage = () => {
       amountPaid: amount,
       paidDate,
       paid: paidStatus,
+      paymentNote: noteInput,
     });
 
     setShowModal(false);
     setSelectedStudent(null);
     setAmountInput("");
     setPaidOnInput("");
+    setNoteInput("");
   };
 
   // export CSV
@@ -348,6 +352,7 @@ const FeesPage = () => {
                                 <th className="px-4 py-2">Paid On</th>
                                 <th className="px-4 py-2">Amount Paid</th>
                                 <th className="px-4 py-2">Carry Forward</th>
+                                <th className="px-4 py-2">Note</th>
                                 <th className="px-4 py-2">Status</th>
                               </tr>
                             </thead>
@@ -392,6 +397,9 @@ const FeesPage = () => {
                                       </td>
                                       <td className="px-4 py-2">
                                         ₹{r.carryForward || 0}
+                                      </td>
+                                      <td className="px-4 py-2">
+                                        {r.paymentNote || "—"}
                                       </td>
                                       <td
                                         className={`px-4 py-2 font-medium ${
@@ -468,6 +476,20 @@ const FeesPage = () => {
               onChange={(e) => setPaidOnInput(e.target.value)}
               className="border border-gray-300 rounded-lg w-full px-3 py-2 mb-4 focus:ring-2 focus:ring-[var(--color-primary-light)]"
             />
+            <label className="text-sm text-gray-600 mb-1 block">
+              Payment Method
+            </label>
+            <select
+              value={noteInput}
+              onChange={(e) => setNoteInput(e.target.value)}
+              className="border border-gray-300 rounded-lg w-full px-3 py-2 mb-4 focus:ring-2 focus:ring-[var(--color-primary-light)]"
+            >
+              <option value="">Select Method</option>
+              <option value="Cash">Cash</option>
+              <option value="Paytm">Paytm</option>
+              <option value="Other">Other</option>
+            </select>
+
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowModal(false)}
