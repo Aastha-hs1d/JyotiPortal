@@ -1,4 +1,3 @@
-// src/theme.js
 export const themes = {
   purple: {
     name: "Purple 💜",
@@ -6,6 +5,12 @@ export const themes = {
     primaryLight: "#7e22ce",
     border: "#a855f7",
     bg: "#faf5ff",
+    accent: "#581c87",
+
+    darkBg: "#1e1330",
+    darkBorder: "#3b1c5c",
+    darkText: "#e6d4ff",
+    darkAccent: "#c084fc",
   },
   emerald: {
     name: "Emerald 🌿",
@@ -13,6 +18,12 @@ export const themes = {
     primaryLight: "#10b981",
     border: "#34d399",
     bg: "#ecfdf5",
+    accent: "#064e3b",
+
+    darkBg: "#0f2f25",
+    darkBorder: "#145a46",
+    darkText: "#d1fae5",
+    darkAccent: "#6ee7b7",
   },
   amber: {
     name: "Amber ☀️",
@@ -20,6 +31,12 @@ export const themes = {
     primaryLight: "#d97706",
     border: "#fbbf24",
     bg: "#fffbeb",
+    accent: "#78350f",
+
+    darkBg: "#2b1800",
+    darkBorder: "#4b2500",
+    darkText: "#fde68a",
+    darkAccent: "#f59e0b",
   },
   teal: {
     name: "Teal 🌊",
@@ -27,6 +44,12 @@ export const themes = {
     primaryLight: "#14b8a6",
     border: "#2dd4bf",
     bg: "#f0fdfa",
+    accent: "#0f766e",
+
+    darkBg: "#082c2a",
+    darkBorder: "#0f4a47",
+    darkText: "#a7f3d0",
+    darkAccent: "#5eead4",
   },
   gray: {
     name: "Gray 🩶",
@@ -34,12 +57,24 @@ export const themes = {
     primaryLight: "#4b5563",
     border: "#9ca3af",
     bg: "#f3f4f6",
+    accent: "#111827",
+
+    darkBg: "#111827",
+    darkBorder: "#1f2937",
+    darkText: "#d1d5db",
+    darkAccent: "#9ca3af",
   },
-  copperSulphate: {
-    primary: "#0E2466", // deep copper sulphate crystal blue
-    primaryLight: "#4156A1", // hydrated lighter reflection
-    border: "#C7D3FF", // soft card borders
-    bg: "#F0F4FF", // very pale background
-    accent: "#5A7BFF",
+  copper: {
+    name: "Copper Sulphate 💧",
+    primary: "#1871BA",
+    primaryLight: "#4E9EE0",
+    border: "#C9E2F5",
+    bg: "#F5FAFF",
+    accent: "#0E3E6F",
+
+    darkBg: "#081a2b", // deep navy-blue tone
+    darkBorder: "#13385c",
+    darkText: "#cfe8ff",
+    darkAccent: "#4E9EE0",
   },
 };

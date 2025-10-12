@@ -1,4 +1,13 @@
 @import "tailwindcss";
+/* Universal pointer for interactive elements */
+button,
+[role="button"],
+a,
+input[type="submit"],
+input[type="button"] {
+  cursor: pointer !important;
+}
+
 body {
   font-family: "Inter", sans-serif;
 }
@@ -15,4 +24,28 @@ body {
 
 .animate-fade-in-up {
   animation: fade-in-up 0.3s ease-out;
+}
+/* === Global theme variables & transitions === */
+:root {
+  --color-bg: #ffffff;
+  --color-accent: #111827;
+  --color-border: #e5e7eb;
+  --color-primary: #1871ba;
+  --color-primary-light: #4e9ee0;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Dark-mode base (Tailwind adds `.dark` on <html>) */
+.dark {
+  background-color: var(--color-bg);
+  color: var(--color-accent);
+}
+
+/* Simple reusable class for all cards / panels */
+.card {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-accent);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
