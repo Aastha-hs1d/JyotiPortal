@@ -24,6 +24,11 @@ const Sidebar = ({ collapsed, setCollapsed, themeName, setThemeName }) => {
   const menuItems = [
     { name: "Dashboard", icon: <Home size={20} />, path: "/" },
     { name: "Students", icon: <Users size={20} />, path: "/students" },
+    {
+      name: "Attendance",
+      icon: <ClipboardList size={20} />,
+      path: "/attendance",
+    },
     { name: "Fees", icon: <FileText size={20} />, path: "/fees" },
     { name: "Notes", icon: <BookOpen size={20} />, path: "/notes" },
     {

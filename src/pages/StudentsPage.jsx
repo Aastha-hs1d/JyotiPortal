@@ -8,6 +8,7 @@ const StudentsPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     grade: "",
+    batch: "",
     joinDate: "",
     monthlyFee: "",
     phone: "",
@@ -16,6 +17,7 @@ const StudentsPage = () => {
   const [sortOption, setSortOption] = useState("none");
   const [sortOrder, setSortOrder] = useState("asc"); // ⬅️ NEW
   const [filterGrade, setFilterGrade] = useState("all");
+  const [filterBatch, setFilterBatch] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   // 📋 Handle form input
@@ -26,7 +28,7 @@ const StudentsPage = () => {
   // ➕ Add or Update student
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { name, grade, joinDate, monthlyFee, phone } = formData;
+    const { name, grade, batch, joinDate, monthlyFee, phone } = formData;
 
     if (!name || !grade || !joinDate || !monthlyFee || !phone)
       return alert("Please fill all fields!");
@@ -44,6 +46,7 @@ const StudentsPage = () => {
         id: Date.now(),
         name: name.trim(),
         grade,
+        batch,
         joinDate,
         monthlyFee: parseFloat(monthlyFee),
         phone,
@@ -56,6 +59,7 @@ const StudentsPage = () => {
     setFormData({
       name: "",
       grade: "",
+      batch: "",
       joinDate: "",
       monthlyFee: "",
       phone: "",
@@ -88,6 +92,10 @@ const StudentsPage = () => {
     // Filter by Grade
     if (filterGrade !== "all") {
       data = data.filter((s) => s.grade === filterGrade);
+    }
+    // Filter by Batch
+    if (filterBatch !== "all") {
+      data = data.filter((s) => s.batch === filterBatch);
     }
 
     // Search by Name
@@ -128,7 +136,7 @@ const StudentsPage = () => {
     }
 
     return data;
-  }, [students, sortOption, sortOrder, filterGrade, searchQuery]);
+  }, [students, sortOption, sortOrder, filterGrade, filterBatch, searchQuery]);
 
   const uniqueGrades = [...new Set(students.map((s) => s.grade))];
   const totalDisplayed = filteredAndSorted.length;
@@ -175,6 +183,17 @@ const StudentsPage = () => {
               type="text"
               placeholder="e.g. 8th Grade"
               value={formData.grade}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--color-primary-light)] transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Batch</label>
+            <input
+              name="batch"
+              type="text"
+              placeholder="e.g. Morning Batch 1, Evening Batch 2"
+              value={formData.batch}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--color-primary-light)] transition-all"
             />
@@ -294,6 +313,22 @@ const StudentsPage = () => {
               <option value="desc">Descending</option>
             </select>
           </div>
+          {/* Filter by Batch */}
+          <div className="flex items-center gap-2">
+            <span className="text-gray-600 text-sm">Filter by Batch:</span>
+            <select
+              value={filterBatch}
+              onChange={(e) => setFilterBatch(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm cursor-pointer hover:border-gray-400 focus:ring-2 focus:ring-[var(--color-primary-light)]"
+            >
+              <option value="all">All</option>
+              {[...new Set(students.map((s) => s.batch))].map((b, idx) => (
+                <option key={idx} value={b}>
+                  {b || "—"}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Filter by Grade */}
           <div className="flex items-center gap-2">
@@ -328,6 +363,7 @@ const StudentsPage = () => {
             <tr>
               <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">Class</th>
+              <th className="px-6 py-3">Batch</th>
               <th className="px-6 py-3">Phone</th>
               <th className="px-6 py-3">Monthly Fee</th>
               <th className="px-6 py-3">Admission Date</th>
@@ -340,6 +376,7 @@ const StudentsPage = () => {
                 <tr key={s.id} className="border-b hover:bg-gray-50 transition">
                   <td className="px-6 py-4 font-medium">{s.name}</td>
                   <td className="px-6 py-4">{s.grade}</td>
+                  <td className="px-6 py-4">{s.batch || "—"}</td>
                   <td className="px-6 py-4">{s.phone}</td>
                   <td className="px-6 py-4">₹{s.monthlyFee}</td>
                   <td className="px-6 py-4">{s.joinDate}</td>

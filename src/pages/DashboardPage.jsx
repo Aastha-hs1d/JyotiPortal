@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useData } from "../context/DataContext"; // ✅ new import
 import {
   PieChart,
   Pie,
@@ -9,27 +10,91 @@ import {
 } from "recharts";
 
 const DashboardPage = () => {
-  // ─────────────────────────────────────────
-  // Circular stat data
-  const [stats, setStats] = useState({
-    feesPaid: 70,
-    attendance: 85,
-    admissions: 60,
-  });
+  const { students, fees } = useData();
+  const [attendanceHistory] = useState(
+    JSON.parse(localStorage.getItem("attendanceHistory")) || {}
+  );
 
-  // Animated values for circle counters
+  const today = new Date();
+  const monthKey = today.toISOString().slice(0, 7);
+
+  // ─────────────────────────────────────────
+  // 📊 compute real analytics
+  const liveStats = useMemo(() => {
+    // Attendance %
+    let total = 0,
+      present = 0;
+    students.forEach((s) => {
+      const records = attendanceHistory[s.id] || [];
+      const monthRecords = records.filter((r) => r.date.startsWith(monthKey));
+      total += monthRecords.length;
+      present += monthRecords.filter((r) => r.present).length;
+    });
+    const attendancePercent =
+      total > 0 ? Math.round((present / total) * 100) : 0;
+
+    // Fees %
+    let totalExpected = 0,
+      totalCollected = 0;
+    fees.forEach((f) => {
+      const monthRecord = f.records.find((r) => r.month === monthKey);
+      if (monthRecord) {
+        const expected =
+          (monthRecord.monthlyFee || 0) + (monthRecord.carryForward || 0);
+        totalExpected += expected;
+        totalCollected += monthRecord.amountPaid || 0;
+      }
+    });
+    const feesPercent =
+      totalExpected > 0
+        ? Math.round((totalCollected / totalExpected) * 100)
+        : 0;
+
+    // New admissions
+    const newAdmissions = students.filter((s) => {
+      const d = new Date(s.joinDate);
+      return (
+        d.getMonth() === today.getMonth() &&
+        d.getFullYear() === today.getFullYear()
+      );
+    }).length;
+
+    return {
+      attendancePercent,
+      feesPercent,
+      newAdmissions,
+      totalCollected,
+      totalExpected,
+    };
+  }, [students, fees, attendanceHistory, monthKey]);
+
+  // ─────────────────────────────────────────
+  // circular animated counters (kept from your original)
+  const [stats, setStats] = useState({
+    feesPaid: 0,
+    attendance: 0,
+    admissions: 0,
+  });
   const [animatedStats, setAnimatedStats] = useState({
     feesPaid: 0,
     attendance: 0,
     admissions: 0,
   });
 
-  // Animate stats filling + counter
+  // update live target values
+  useEffect(() => {
+    setStats({
+      feesPaid: liveStats.feesPercent,
+      attendance: liveStats.attendancePercent,
+      admissions: Math.min(liveStats.newAdmissions * 10, 100), // same scaling
+    });
+  }, [liveStats]);
+
+  // animate numbers smoothly (your existing logic)
   useEffect(() => {
     const duration = 1200;
     const step = 15;
     const steps = Math.floor(duration / step);
-
     let current = { feesPaid: 0, attendance: 0, admissions: 0 };
 
     const timer = setInterval(() => {
@@ -65,16 +130,22 @@ const DashboardPage = () => {
   }, [stats]);
 
   // ─────────────────────────────────────────
-  // Donut chart data
-  const feeData = [
-    { name: "Paid", value: 12000, students: 18 },
-    { name: "Pending", value: 2500, students: 4 },
-    { name: "Late", value: 1000, students: 2 },
-  ];
+  // donut chart values (now live)
+  const feeData = useMemo(() => {
+    const paid = liveStats.totalCollected;
+    const pending = Math.max(liveStats.totalExpected - paid, 0);
+    const late = 0; // placeholder; can compute via dueDate vs paidDate later
+    return [
+      { name: "Paid", value: paid, students: students.length },
+      { name: "Pending", value: pending, students: students.length },
+      { name: "Late", value: late, students: 0 },
+    ];
+  }, [liveStats, students]);
+
   const COLORS = ["#10B981", "#FACC15", "#EF4444"];
   const totalFees = feeData.reduce((a, b) => a + b.value, 0);
 
-  // Total counter animation
+  // your total counter animation kept as-is
   const [displayedTotal, setDisplayedTotal] = useState(0);
   useEffect(() => {
     let start = 0;
@@ -95,13 +166,12 @@ const DashboardPage = () => {
     return () => clearInterval(timer);
   }, [totalFees]);
 
-  // Hover for donut
   const [activeIndex, setActiveIndex] = useState(null);
   const onEnter = (_, i) => setActiveIndex(i);
   const onLeave = () => setActiveIndex(null);
 
   // ─────────────────────────────────────────
-  // Reusable animated CircleProgress component
+  // CircleProgress component unchanged
   const CircleProgress = ({ label, value }) => {
     const radius = 45;
     const circumference = 2 * Math.PI * radius;
@@ -110,7 +180,6 @@ const DashboardPage = () => {
     return (
       <div className="flex flex-col items-center justify-center bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:scale-[1.04] transition-all duration-300 cursor-pointer">
         <svg className="w-28 h-28 mb-3" viewBox="0 0 100 100">
-          {/* background track */}
           <circle
             stroke="#e5e7eb"
             strokeWidth="10"
@@ -119,9 +188,8 @@ const DashboardPage = () => {
             cx="50"
             cy="50"
           />
-          {/* animated progress path */}
           <circle
-            stroke="var(--color-primary)" // ✅ green
+            stroke="var(--color-primary)"
             strokeWidth="10"
             strokeLinecap="round"
             fill="transparent"
@@ -130,12 +198,11 @@ const DashboardPage = () => {
             cy="50"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
-            transform="rotate(-90 50 50)" // ✅ start from top
+            transform="rotate(-90 50 50)"
             style={{
               transition: "stroke-dashoffset 0.8s ease-out",
             }}
           />
-          {/* centered percentage */}
           <text
             x="50%"
             y="50%"
@@ -152,7 +219,7 @@ const DashboardPage = () => {
   };
 
   // ─────────────────────────────────────────
-  // Render
+  // Render (identical styling)
   return (
     <div className="p-6">
       <p className="text-gray-600 mt-2 mb-6">
@@ -246,19 +313,27 @@ const DashboardPage = () => {
           <h2 className="text-gray-500 text-sm font-medium mb-1">
             Total Students
           </h2>
-          <p className="text-4xl font-bold text-gray-800">42</p>
+          <p className="text-4xl font-bold text-gray-800">{students.length}</p>
         </div>
         <div className="p-5 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
           <h2 className="text-gray-500 text-sm font-medium mb-1">
             Fees Collected
           </h2>
-          <p className="text-4xl font-bold text-green-600">₹12,000</p>
+          <p className="text-4xl font-bold text-green-600">
+            ₹{liveStats.totalCollected.toLocaleString()}
+          </p>
         </div>
         <div className="p-5 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
           <h2 className="text-gray-500 text-sm font-medium mb-1">
             Pending Fees
           </h2>
-          <p className="text-4xl font-bold text-red-500">₹3,500</p>
+          <p className="text-4xl font-bold text-red-500">
+            ₹
+            {Math.max(
+              liveStats.totalExpected - liveStats.totalCollected,
+              0
+            ).toLocaleString()}
+          </p>
         </div>
       </div>
 

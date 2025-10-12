@@ -150,7 +150,7 @@ const SettingsPage = () => {
       </p>
 
       {/* 🎨 THEME & DISPLAY */}
-      <div className="p-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
+      <div className="p-6 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-6 transition-all duration-300">
         <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-100 flex items-center gap-2">
           <Palette className="text-[var(--color-primary)]" size={18} /> Theme &
           Display

@@ -17,6 +17,7 @@ import NotesPage from "./pages/NotesPage";
 import TestPlannerPage from "./pages/TestPlannerPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import SettingsPage from "./pages/SettingsPage";
+import AttendancePage from "./pages/AttendancePage";
 
 function App() {
   // theme state
@@ -53,6 +54,7 @@ function App() {
             <Route path="/test-planner" element={<TestPlannerPage />} />
             <Route path="/announcements" element={<AnnouncementsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/attendance" element={<AttendancePage />} />
           </Route>
         </Routes>
       </div>
