@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import { useData } from "../context/DataContext";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
+import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 const FeesPage = () => {
   const { students, fees, generateMonthlyFees, updateFeeRecord } = useData();
@@ -17,6 +19,7 @@ const FeesPage = () => {
   const [paidOnInput, setPaidOnInput] = useState("");
   const [noteInput, setNoteInput] = useState("");
   const [expandedStudent, setExpandedStudent] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // only generate once when students exist and month changes
@@ -43,9 +46,10 @@ const FeesPage = () => {
     setShowModal(true);
   };
 
-  // save payment info
   const savePayment = () => {
     if (!selectedStudent) return;
+    setLoading(true); // 🌀 show loader immediately
+
     const rec = getRecord(selectedStudent.id);
     const carryForward = rec?.carryForward || 0;
     const totalDue = selectedStudent.monthlyFee + carryForward;
@@ -56,61 +60,73 @@ const FeesPage = () => {
     let paidStatus = false;
     if (amount >= totalDue) paidStatus = true;
 
-    updateFeeRecord(selectedStudent.id, month, {
-      amountPaid: amount,
-      paidDate,
-      paid: paidStatus,
-      paymentNote: noteInput,
-    });
+    // ✅ Simulate a short delay for smoother UX
+    setTimeout(() => {
+      updateFeeRecord(selectedStudent.id, month, {
+        amountPaid: amount,
+        paidDate,
+        paid: paidStatus,
+        paymentNote: noteInput,
+      });
 
-    setShowModal(false);
-    setSelectedStudent(null);
-    setAmountInput("");
-    setPaidOnInput("");
-    setNoteInput("");
+      // Close modal and clear fields
+      setShowModal(false);
+      setSelectedStudent(null);
+      setAmountInput("");
+      setPaidOnInput("");
+      setNoteInput("");
+
+      setLoading(false); // 🟢 hide loader
+      toast.success("Payment saved successfully!"); // 🎉 toast feedback
+    }, 600);
   };
 
-  // export CSV
   const exportReport = () => {
-    const rows = filteredStudents
-      .map((s) => {
-        const rec = getRecord(s.id);
-        if (!rec) return null;
-        const carryForward = rec.carryForward || 0;
-        const totalDue = s.monthlyFee + carryForward;
-        const paid = rec.amountPaid || 0;
-        const remaining = Math.max(totalDue - paid, 0);
+    setLoading(true);
+    setTimeout(() => {
+      const rows = filteredStudents
+        .map((s) => {
+          const rec = getRecord(s.id);
+          if (!rec) return null;
+          const carryForward = rec.carryForward || 0;
+          const totalDue = s.monthlyFee + carryForward;
+          const paid = rec.amountPaid || 0;
+          const remaining = Math.max(totalDue - paid, 0);
 
-        const dueDate = rec.dueDate || "—";
-        const paidDate = rec.paidDate || "—";
+          const dueDate = rec.dueDate || "—";
+          const paidDate = rec.paidDate || "—";
 
-        let status = "Pending";
-        if (paid >= totalDue) {
-          status = new Date(paidDate) > new Date(dueDate) ? "Late" : "Paid";
-        } else if (paid > 0 && paid < totalDue) {
-          status = "Partial";
-        } else if (new Date() > new Date(dueDate)) {
-          status = "Late";
-        }
+          let status = "Pending";
+          if (paid >= totalDue) {
+            status = new Date(paidDate) > new Date(dueDate) ? "Late" : "Paid";
+          } else if (paid > 0 && paid < totalDue) {
+            status = "Partial";
+          } else if (new Date() > new Date(dueDate)) {
+            status = "Late";
+          }
 
-        return {
-          Name: s.name,
-          Grade: s.grade,
-          "Monthly Fee": s.monthlyFee,
-          "Carry Forward": carryForward,
-          "Total Due": totalDue,
-          "Amount Paid": paid,
-          Remaining: remaining,
-          "Due Date": dueDate,
-          "Paid On": paidDate,
-          Status: status,
-        };
-      })
-      .filter(Boolean);
+          return {
+            Name: s.name,
+            Grade: s.grade,
+            "Monthly Fee": s.monthlyFee,
+            "Carry Forward": carryForward,
+            "Total Due": totalDue,
+            "Amount Paid": paid,
+            Remaining: remaining,
+            "Due Date": dueDate,
+            "Paid On": paidDate,
+            Status: status,
+          };
+        })
+        .filter(Boolean);
 
-    const csv = Papa.unparse(rows);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    saveAs(blob, `Fees_Report_${month}.csv`);
+      const csv = Papa.unparse(rows);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      saveAs(blob, `Fees_Report_${month}.csv`);
+
+      setLoading(false);
+      toast.success("Report downloaded successfully!");
+    }, 800);
   };
 
   // filter students
@@ -174,6 +190,7 @@ const FeesPage = () => {
 
   return (
     <div className="p-6">
+      <Loader show={loading} text="Processing..." />
       <p className="text-gray-600 mb-6">
         Track payments, due dates, and monthly histories with ease.
       </p>
@@ -240,7 +257,7 @@ const FeesPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto max-w-full">
         <table className="min-w-full text-sm text-left text-gray-700">
           <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 uppercase text-xs">
             <tr>
@@ -284,7 +301,10 @@ const FeesPage = () => {
                       key={s.id}
                       className="border-b hover:bg-gray-50 transition"
                     >
-                      <td className="px-6 py-4 font-medium">{s.name}</td>
+                      <td className="px-4 py-3 font-medium whitespace-normal text-sm">
+                        {s.name}
+                      </td>
+
                       <td className="px-6 py-4">{s.grade}</td>
                       <td className="px-6 py-4">₹{s.monthlyFee}</td>
                       <td className="px-6 py-4 text-yellow-600">
@@ -455,7 +475,7 @@ const FeesPage = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white rounded-2xl shadow-lg p-6 w-[90%] max-w-md animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-md max-h-[90vh] overflow-y-auto animate-fade-in">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">
               Mark Payment for {selectedStudent?.name}
             </h2>

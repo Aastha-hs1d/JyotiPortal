@@ -3,6 +3,7 @@ import { FileText, Sparkles, Download, History, Eye } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.js?worker";
 import jsPDF from "jspdf";
+import Loader from "../components/Loader";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -134,10 +135,10 @@ export default function TestPlannerPage() {
 
   return (
     <div className="p-6 space-y-8">
+      <Loader show={loading} text="Generating test..." />;
       <p className="text-gray-600">
         Upload a PDF and generate customized question papers automatically ✨
       </p>
-
       {/* Upload Section */}
       <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
         <h2 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
@@ -156,7 +157,6 @@ export default function TestPlannerPage() {
           </p>
         )}
       </div>
-
       {/* PDF Preview */}
       {pdfText && (
         <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -179,7 +179,6 @@ export default function TestPlannerPage() {
           )}
         </div>
       )}
-
       {/* Test Configuration */}
       <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100 space-y-4">
         <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2">
@@ -262,7 +261,6 @@ export default function TestPlannerPage() {
           </div>
         </div>
       </div>
-
       {/* Generated Questions */}
       {questions.length > 0 && (
         <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -315,7 +313,6 @@ export default function TestPlannerPage() {
           </div>
         </div>
       )}
-
       {/* Previous Tests */}
       {savedTests.length > 0 && (
         <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">

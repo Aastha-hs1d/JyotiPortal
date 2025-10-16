@@ -311,7 +311,10 @@ const AttendancePage = () => {
                       key={s.id}
                       className="border-b hover:bg-gray-50 transition-all"
                     >
-                      <td className="px-6 py-4 font-medium">{s.name}</td>
+                      <td className="px-4 py-3 font-medium whitespace-normal text-sm">
+                        {s.name}
+                      </td>
+
                       <td className="px-6 py-4">{s.grade}</td>
                       <td className="px-6 py-4">{s.batch || "—"}</td>
                       <td className="px-6 py-4 text-center">

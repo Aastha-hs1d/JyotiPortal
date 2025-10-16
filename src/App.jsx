@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
-// ✅ COMPONENTS (lowercase filenames)
-import Sidebar from "./components/sidebar";
-import Navbar from "./components/navbar";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-// ✅ THEMES
-import { themes } from "./theme";
-
-// ✅ PAGES (PascalCase filenames)
+// ✅ PAGES
 import DashboardPage from "./pages/DashboardPage";
 import StudentsPage from "./pages/StudentsPage";
 import FeesPage from "./pages/FeesPage";
@@ -18,9 +14,14 @@ import TestPlannerPage from "./pages/TestPlannerPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import SettingsPage from "./pages/SettingsPage";
 import AttendancePage from "./pages/AttendancePage";
+import LoginPage from "./pages/LoginPage";
+import { Navigate } from "react-router-dom";
+import { isAuthenticated } from "./hooks/useAuth";
+
+// ✅ THEMES
+import { themes } from "./theme";
 
 function App() {
-  // theme state
   const [themeName, setThemeName] = useState(
     localStorage.getItem("theme") || "emerald"
   );
@@ -40,22 +41,32 @@ function App() {
           "--color-bg": theme.bg,
           backgroundColor: "var(--color-bg)",
         }}
+        className="min-h-screen transition-all duration-300"
       >
+        <Toaster position="top-right" reverseOrder={false} />
+
         <Routes>
+          {/* 🔒 Protected Routes */}
           <Route
+            path="/"
             element={
-              <Layout themeName={themeName} setThemeName={setThemeName} />
+              <ProtectedRoute>
+                <Layout themeName={themeName} setThemeName={setThemeName} />
+              </ProtectedRoute>
             }
           >
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/students" element={<StudentsPage />} />
-            <Route path="/fees" element={<FeesPage />} />
-            <Route path="/notes" element={<NotesPage />} />
-            <Route path="/test-planner" element={<TestPlannerPage />} />
-            <Route path="/announcements" element={<AnnouncementsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/attendance" element={<AttendancePage />} />
+            <Route index element={<DashboardPage />} />
+            <Route path="students" element={<StudentsPage />} />
+            <Route path="fees" element={<FeesPage />} />
+            <Route path="notes" element={<NotesPage />} />
+            <Route path="test-planner" element={<TestPlannerPage />} />
+            <Route path="announcements" element={<AnnouncementsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="attendance" element={<AttendancePage />} />
           </Route>
+
+          {/* 🪪 Public Routes */}
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
     </Router>

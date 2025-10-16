@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Megaphone, Plus, Trash2, Send, Edit, Bell } from "lucide-react";
+import toast from "react-hot-toast"; // 🧃 added toast import
 
 const AnnouncementsPage = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -26,7 +27,7 @@ const AnnouncementsPage = () => {
   // ➕ Create or Edit Announcement
   const handleSave = () => {
     if (!message.trim()) {
-      alert("Message cannot be empty!");
+      toast.error("Message cannot be empty!"); // ⚡ replaced alert with toast
       return;
     }
 
@@ -46,6 +47,7 @@ const AnnouncementsPage = () => {
       setAnnouncements(updated);
       saveToStorage(updated);
       setEditingAnnouncement(null);
+      toast.success("Announcement updated!"); // ✅ toast added
     } else {
       // ➕ Create new announcement
       const newAnnouncement = {
@@ -59,6 +61,7 @@ const AnnouncementsPage = () => {
       const updated = [newAnnouncement, ...announcements];
       setAnnouncements(updated);
       saveToStorage(updated);
+      toast.success("Announcement created!"); // ✅ toast added
     }
 
     setShowModal(false);
@@ -73,11 +76,13 @@ const AnnouncementsPage = () => {
       const updated = announcements.filter((a) => a.id !== id);
       setAnnouncements(updated);
       saveToStorage(updated);
+      toast.success("Announcement deleted!"); // ✅ toast added
     }
   };
 
   // 📣 Dummy broadcast
   const handleBroadcast = (a) => {
+    toast("📢 Broadcasting announcement..."); // ✅ toast feedback
     alert(
       `📢 Broadcasting to WhatsApp:\n\n"${a.title}"\n\n${a.message}\n\n(This will be automated via backend later.)`
     );
@@ -86,11 +91,15 @@ const AnnouncementsPage = () => {
     );
     setAnnouncements(updated);
     saveToStorage(updated);
+    toast.success("Announcement broadcasted!"); // ✅ toast added
   };
 
   // ✏️ Open Edit Modal
   const handleEdit = (a) => {
-    if (a.status === "Broadcasted") return; // disable edit for broadcasted
+    if (a.status === "Broadcasted") {
+      toast.error("You cannot edit a broadcasted announcement."); // ✅ toast for blocked edit
+      return;
+    }
     setEditingAnnouncement(a);
     setTitle(a.title);
     setMessage(a.message);
@@ -141,11 +150,11 @@ const AnnouncementsPage = () => {
           !notification // avoid spamming
         ) {
           setNotification(a);
-          // auto dismiss after 8s
+          toast("🔔 Scheduled announcement is due!"); // ✅ added toast
           setTimeout(() => setNotification(null), 8000);
         }
       });
-    }, 30000); // check every 30 seconds
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [announcements, notification]);
@@ -313,7 +322,7 @@ const AnnouncementsPage = () => {
       {/* Modal (Create / Edit) */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-md animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-md max-h-[90vh] overflow-y-auto animate-fade-in">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               {editingAnnouncement
                 ? "Edit Announcement"

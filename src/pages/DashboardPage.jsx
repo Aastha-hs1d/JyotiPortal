@@ -283,11 +283,16 @@ const DashboardPage = () => {
                   n,
                 ]}
                 contentStyle={{
-                  backgroundColor: "white",
+                  backgroundColor: "#1f2937", // dark background
+                  color: "#ffffff", // white text
                   borderRadius: "10px",
-                  border: "1px solid #ddd",
+                  border: "1px solid #374151",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                 }}
+                itemStyle={{ color: "#f9fafb" }}
+                cursor={{ fill: "rgba(0,0,0,0.05)" }}
               />
+
               <Legend
                 layout="vertical"
                 verticalAlign="middle"
